@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Hasil Divisi</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<!-- Musik tetap autoplay -->
+<audio autoplay loop>
+  <source src="DI BALIK MEJA 2G.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Dibungkus agar selalu CENTER -->
+<div class="center-wrapper">
+  <div class="container" id="output"></div>
+</div>
+
+<script>
+// struktur data
+const struktur = {
+ "Media & Kreatif":{
+   ketua:"Wina Evita Maharani",
+   biro:{
+    "Dokumentasi":["Nirwana Oktavian Nugraha","Nuke Tri Amanda","Samuel Tegar Obaja SK"],
+    "Publikasi":["Jenny Ayudia"]
+   }
+ },
+ "Event":{
+   ketua:"Jasmine Arminta Minami",
+   biro:{
+    "Entertaiment":["Alhayya Maritza","Putri Nurlailawato"],
+    "Games":["Alya Rahman Ayuningsih","Faris Muhammad","Sulthan Achmad Badghaish"]
+   }
+ },
+ "Rohani":{
+   ketua:"Ton Zaid Muhammad Lutfhi",
+   biro:{}
+ },
+ "Finance":{
+   ketua:"Ihsan Septian R",
+   biro:{}
+ }
+};
+
+// mapping semua nama
+let allMembers = {};
+for (let div in struktur){
+  const ketua = struktur[div].ketua;
+  allMembers[ketua] = {divisi:div, role:"Ketua", biro:null};
+
+  for (let biro in struktur[div].biro){
+    struktur[div].biro[biro].forEach(n=>{
+      allMembers[n] = {divisi:div, role:"Anggota", biro:biro};
+    });
+  }
+}
+
+const params = new URLSearchParams(window.location.search);
+const nama = params.get("nama");
+const box = document.getElementById("output");
+
+// tampilan hasil
+if(!allMembers[nama]){
+  box.innerHTML = `<h2>Nama tidak ditemukan 😢</h2>`;
+} else {
+  const data = allMembers[nama];
+  let html = `<h1 class="big-title">Selamat ${nama}!</h1>`;
+  html += `<p class="desc">Kamu masuk ke <b>Divisi ${data.divisi}</b>. Semangat yaaa ✨</p>`;
+
+  if(data.role === "Ketua"){
+    html += `<p><b>Kamu adalah Ketua Divisi.</b></p>`;
+    html += `<h3>Anggota Divisi Kamu:</h3>`;
+
+    let anggotaList = [];
+    for(let biro in struktur[data.divisi].biro){
+      struktur[data.divisi].biro[biro].forEach(a=>{
+        anggotaList.push(`${a} — Biro ${biro}`);
+      });
+    }
+
+    if(anggotaList.length===0){
+      html += "<p>(Tidak ada anggota)</p>";
+    } else {
+      html += "<ul class='anggota-list'>" + anggotaList.map(a=>`<li>${a}</li>`).join("") + "</ul>";
+    }
+
+  } else {
+    html += `<p>Biro Kamu: <b>${data.biro}</b></p>`;
+    html += `<p>Ketua Divisimu: <b>${struktur[data.divisi].ketua}</b></p>`;
+  }
+
+  box.innerHTML = html;
+}
+
+// efek kembang api
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+function fireworks(){
+  for(let i=0;i<50;i++){
+    ctx.fillStyle = "#ffd400";
+    ctx.beginPath();
+    ctx.arc(Math.random()*canvas.width, Math.random()*canvas.height, 2, 0, 2*Math.PI);
+    ctx.fill();
+  }
+}
+setInterval(fireworks, 200);
+</script>
+
+</body>
+</html>
